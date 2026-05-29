@@ -15,6 +15,8 @@ class Game
     #iPlayerPositionYPrevious = 0; //top-left of screen = 0,0   
     #iPlayerStepsTaken = 0;
     #iPlayerHitHead = 0;
+    #bPlayerFoundTreasure = false;
+    #bGameOver = false;
 
     constructor()
     {
@@ -33,6 +35,7 @@ class Game
         this.#iPlayerPositionYPrevious = 0; //top-left of screen = 0,0   
         this.#iPlayerStepsTaken = 0;
         this.#iPlayerHitHead = 0;
+        this.#bPlayerFoundTreasure = false;
 
         this.#initMap();
     }
@@ -116,12 +119,10 @@ class Game
         if (bOutOfBounds)
         {
             this.#setNewPlayerPositionUndo();
-            // console.log("out of bounds detected, undo position");
             return;
         }
 
         //detect collision
-        // console.log("bounds", bOutOfBounds);
         sDetectedObject = this.#arrMapLines[this.#iPlayerPositionY].substring(this.#iPlayerPositionX, this.#iPlayerPositionX+1);
         console.log("sDetectedObject", sDetectedObject);
 
@@ -130,7 +131,7 @@ class Game
             case "|":
             case "-":
                 this.#iPlayerHitHead++;
-                if (this.#iPlayerHitHead >= 3)
+                if (this.#iPlayerHitHead >= 113)
                 {
                     this.#objDivMessageBox.innerHTML = "You hit your head too many times<br>";
                     this.#playerDead();    
@@ -143,9 +144,22 @@ class Game
                 this.#objDivMessageBox.innerHTML = "You fell into a pit (P)<br>";
                 this.#playerDead();    
                 break;                
-            case "B":
-                this.#objDivMessageBox.innerHTML = "You reached your Broad, congrats dude.<br>Evil warlord Harry [Dutch pronunciation] is very unhappy";
-                this.#setNewPlayerPositionUndo();
+            case "M":
+                this.#objDivMessageBox.innerHTML = "You found a monster and were eaten (M)<br>";
+                this.#playerDead();    
+                break;                  
+            case "T":
+                this.#objDivMessageBox.innerHTML = "You found a treasure (T)<br>";
+                this.#bPlayerFoundTreasure = true;
+                break;                        
+            case "S":
+                this.#objDivMessageBox.innerHTML = `You reached your broad in ${this.#iPlayerStepsTaken} steps. `;
+                if (this.#bPlayerFoundTreasure)
+                    this.#objDivMessageBox.innerHTML+= 'You found the treasure<br>'
+                else
+                    this.#objDivMessageBox.innerHTML+= 'You didnt find the treasure<br>'
+                this.#objDivMessageBox.innerHTML+= 'Evil warlord Harry is not mad, but dissapointed. <a href="">reset</a>';
+                this.#bGameOver = true;
                 break;
             case " ":
                 this.#objDivMessageBox.innerHTML = `You took ${this.#iPlayerStepsTaken} steps`;
@@ -154,8 +168,8 @@ class Game
 
     #playerDead()
     {
-        this.#objDivMessageBox.innerHTML += `You died! You are back at your starting position (H)`;
-        this.resetGame();
+        this.#objDivMessageBox.innerHTML += `You died! <a href="">reset</a>`;
+        this.#bGameOver = true;
     }
 
     #addEventListeners()
@@ -172,6 +186,7 @@ class Game
                 if (objEvent.repeat == true)
                     return;
             }
+
 
             // console.log(`Key down: ${objEvent.key}`);
             if (objEvent.key == "ArrowUp")
@@ -209,6 +224,9 @@ class Game
      */
     #setNewPlayerPosition(iNewX, iNewY)
     {
+        if (this.#bGameOver)
+            return;
+
         this.#iPlayerPositionXPrevious = this.#iPlayerPositionX;
         this.#iPlayerPositionYPrevious = this.#iPlayerPositionY;
         this.#iPlayerPositionX = iNewX;
@@ -236,5 +254,5 @@ class Game
 }
 
 
-objGame = new Game();
+var objGame = new Game();
 
