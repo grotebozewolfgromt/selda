@@ -131,7 +131,7 @@ class Game
             case "|":
             case "-":
                 this.#iPlayerHitHead++;
-                if (this.#iPlayerHitHead >= 113)
+                if (this.#iPlayerHitHead >= 3)
                 {
                     this.#objDivMessageBox.innerHTML = "You hit your head too many times<br>";
                     this.#playerDead();    
